@@ -2,6 +2,8 @@ package com.jmarino.m.p.pingpong.ping.broker;
 
 import java.io.IOException;
 
+import org.springframework.stereotype.Component;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -10,6 +12,7 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+@Component
 public class Client {
 
 	private ConnectionFactory connFactory;
