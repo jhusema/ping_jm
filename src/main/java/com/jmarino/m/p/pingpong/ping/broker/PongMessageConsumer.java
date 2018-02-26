@@ -44,7 +44,6 @@ public class PongMessageConsumer {
 		public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
 				throws IOException {
 			ObjectMapper mapper = new ObjectMapper();
-			String bodyString = new String(body);
 			BrokerMessage brokerMessage = mapper.readValue(body, BrokerMessage.class);
 			CompletableFuture<BrokerMessage> completableFuture = PongMessageConsumer.this.completables
 					.remove(brokerMessage.UUID);
