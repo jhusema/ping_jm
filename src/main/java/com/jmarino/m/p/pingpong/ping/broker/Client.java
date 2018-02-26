@@ -1,9 +1,14 @@
 package com.jmarino.m.p.pingpong.ping.broker;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -16,18 +21,25 @@ import com.rabbitmq.client.Envelope;
 public class Client {
 
 	private ConnectionFactory connFactory;
+	public Map<String, CompletableFuture<BrokerMessage>> transactionCompetables;
 
 	public Client() {
 		this.connFactory = new ConnectionFactory();
 		this.connFactory.setHost("localhost");
+		this.transactionCompetables = new HashMap<String, CompletableFuture<BrokerMessage>>();
 	}
 
-	public void sendPingMessage(String message) {
+	public void sendPingMessage(String clientTxId, CompletableFuture<BrokerMessage> completableFuture) {
+		BrokerMessage message = new BrokerMessage();
+		message.clientTxID = clientTxId;
+		message.UUID = UUID.randomUUID().toString();
+		message.message = ConstansProperties.PING_MESSAGE;
+		this.transactionCompetables.put(message.UUID, completableFuture);
 		try {
 			Connection connection = this.connFactory.newConnection();
 			Channel channel = connection.createChannel();
-			channel.queueDeclare(ConnectionProperties.PING_QUEUE_NAME, false, false, false, null);
-			channel.basicPublish("", ConnectionProperties.PING_QUEUE_NAME, null, message.getBytes());
+			channel.queueDeclare(ConstansProperties.PING_QUEUE_NAME, false, false, false, null);
+			channel.basicPublish("", ConstansProperties.PING_QUEUE_NAME, null, clientTxId.getBytes());
 			channel.close();
 			connection.close();
 		} catch (Exception e) {
@@ -40,16 +52,21 @@ public class Client {
 			Connection connection = this.connFactory.newConnection();
 			Channel channel = connection.createChannel();
 
-			channel.queueDeclare(ConnectionProperties.PONG_QUEUE_NAME, false, false, false, null);
+			channel.queueDeclare(ConstansProperties.PONG_QUEUE_NAME, false, false, false, null);
 			Consumer consumer = new DefaultConsumer(channel) {
 				@Override
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 						byte[] body) throws IOException {
-					String message = new String(body, "UTF-8");
-					System.out.println(" [x] Received '" + message + "'");
+					ObjectMapper mapper = new ObjectMapper();
+					BrokerMessage brokerMessage = mapper.readValue(body, BrokerMessage.class);
+					CompletableFuture<BrokerMessage> completableFuture = Client.this.transactionCompetables
+							.remove(brokerMessage.UUID);
+					if (completableFuture != null) {
+						completableFuture.complete(brokerMessage);
+					}
 				}
 			};
-			channel.basicConsume(ConnectionProperties.PONG_QUEUE_NAME, true, consumer);
+			channel.basicConsume(ConstansProperties.PONG_QUEUE_NAME, true, consumer);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
