@@ -3,6 +3,7 @@ package com.jmarino.m.p.pingpong.ping.broker;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.pool2.PooledObjectFactory;
 import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.Channel;
@@ -13,10 +14,12 @@ import com.rabbitmq.client.ConnectionFactory;
 public class BrokerConnMngmt {
 	private ConnectionFactory connFactory;
 	private Connection connection;
+	private PooledObjectFactory<Channel> channelPool;
 
 	public BrokerConnMngmt() {
 		this.connFactory = new ConnectionFactory();
 		this.connFactory.setHost("localhost");
+		this.connFactory.setAutomaticRecoveryEnabled(true);
 		try {
 			this.connection = this.connFactory.newConnection();
 		} catch (IOException e) {
@@ -24,6 +27,9 @@ public class BrokerConnMngmt {
 		} catch (TimeoutException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void initChannelPool() {
 	}
 
 	public Connection getConnection() {
@@ -54,5 +60,9 @@ public class BrokerConnMngmt {
 			e.printStackTrace();
 		}
 		return channel;
+	}
+
+	public Channel getChannelConsumerBP() {
+		return null;
 	}
 }

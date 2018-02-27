@@ -3,12 +3,14 @@ package com.jmarino.m.p.pingpong.ping;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.jmarino.m.p.pingpong.ping.broker.BrokerMessage;
 
@@ -26,4 +28,15 @@ public class PingApplication {
 		Map<String, CompletableFuture<BrokerMessage>> completables = new HashMap<String, CompletableFuture<BrokerMessage>>();
 		return completables;
 	}
+
+//	@Bean
+//	public Executor asyncExecutor() {
+//		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+//		executor.setCorePoolSize(10);
+//		executor.setMaxPoolSize(70);
+//		executor.setQueueCapacity(500);
+//		executor.setThreadNamePrefix("PingPongService-");
+//		executor.initialize();
+//		return executor;
+//	}
 }

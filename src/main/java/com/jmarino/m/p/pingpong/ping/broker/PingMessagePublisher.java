@@ -43,4 +43,27 @@ public class PingMessagePublisher {
 			e.printStackTrace();
 		}
 	}
+
+	public void sendPingMessageBP(String clientTxId, CompletableFuture<BrokerMessage> completableFuture) {
+		BrokerMessage message = new BrokerMessage();
+		message.clientTxID = clientTxId;
+		message.UUID = UUID.randomUUID().toString();
+		message.message = ConstansProperties.PING_MESSAGE;
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonMessage = "";
+		try {
+			jsonMessage = mapper.writeValueAsString(message);
+		} catch (JsonProcessingException e1) {
+			e1.printStackTrace();
+		}
+		this.completables.put(message.UUID, completableFuture);
+		try {
+			Channel channel = this.brokerConnMngmt.getChannel();
+			channel.queueDeclare(ConstansProperties.PING_QUEUE_NAME, false, false, false, null);
+			channel.basicPublish("", ConstansProperties.PING_QUEUE_NAME, null, jsonMessage.getBytes());
+			channel.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
