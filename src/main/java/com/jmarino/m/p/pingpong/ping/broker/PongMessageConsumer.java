@@ -27,8 +27,8 @@ public class PongMessageConsumer {
 	private void initConsumer() {
 		Channel channel = this.brokerConnMngmt.getChannel();
 		try {
-			channel.queueDeclare(ConstansProperties.PING_QUEUE_NAME, false, false, false, null);
-			channel.basicConsume(ConstansProperties.PING_QUEUE_NAME, true, this.new Consumer(channel));
+			channel.queueDeclare(ConstansProperties.PONG_QUEUE_NAME, false, false, false, null);
+			channel.basicConsume(ConstansProperties.PONG_QUEUE_NAME, true, this.new Consumer(channel));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
