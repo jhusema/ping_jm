@@ -26,16 +26,4 @@ public class PingService {
 		this.pingMessagePublisher.sendPingMessage(clientTxId, completableFuture);
 		return completableFuture;
 	}
-
-	@RequestMapping("pingMessageBP")
-	@Async
-	public CompletableFuture<BrokerMessage> pingBP(@RequestParam(name = "txId", required = false) String clientTxId,
-			HttpServletResponse response) {
-		CompletableFuture<BrokerMessage> completableFuture = new CompletableFuture<BrokerMessage>();
-		response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-		BrokerMessage brokerMessage = new BrokerMessage();
-		brokerMessage.message = "Servicio no disponible";
-		completableFuture.complete(brokerMessage);
-		return completableFuture;
-	}
 }

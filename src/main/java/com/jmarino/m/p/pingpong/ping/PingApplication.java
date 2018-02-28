@@ -29,14 +29,14 @@ public class PingApplication {
 		return completables;
 	}
 
-//	@Bean
-//	public Executor asyncExecutor() {
-//		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-//		executor.setCorePoolSize(10);
-//		executor.setMaxPoolSize(70);
-//		executor.setQueueCapacity(500);
-//		executor.setThreadNamePrefix("PingPongService-");
-//		executor.initialize();
-//		return executor;
-//	}
+	@Bean
+	public Executor asyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(10);
+		executor.setMaxPoolSize(70);
+		executor.setQueueCapacity(100);
+		executor.setThreadNamePrefix("PingPongService-");
+		executor.initialize();
+		return executor;
+	}
 }

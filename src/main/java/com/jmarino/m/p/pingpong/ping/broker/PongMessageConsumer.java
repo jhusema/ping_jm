@@ -21,7 +21,9 @@ public class PongMessageConsumer {
 			Map<String, CompletableFuture<BrokerMessage>> completables) {
 		this.brokerConnMngmt = brokerMessage;
 		this.completables = completables;
-		this.initConsumer();
+		for (int i = 0; i <= 7; i++) {
+			this.initConsumer();
+		}
 	}
 
 	private void initConsumer() {
